@@ -1809,6 +1809,7 @@
 #define IDD_SETTINGSDIALOGS3            4593
 #define IDD_CERTCHECK                   4594
 #define IDD_RESOLVESUBMODULECONFLICT    4595
+#define IDD_REFLIST                     4596
 #define IDC_COMBOBOXEX_LOCAL_BRANCH     5000
 #define IDC_COMBOBOXEX_REMOTE_BRANCH    5001
 #define IDC_COMBOBOXEX_BAD              5001
