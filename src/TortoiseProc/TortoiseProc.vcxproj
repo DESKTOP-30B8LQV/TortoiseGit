@@ -122,6 +122,7 @@
     <ClCompile Include="CheckCertificateDlg.cpp" />
     <ClCompile Include="ColumnManager.cpp" />
     <ClCompile Include="Commands\DaemonCommand.cpp" />
+    <ClCompile Include="CommitIsOnRefsDlg.cpp" />
     <ClCompile Include="FindBar.cpp" />
     <ClCompile Include="GravatarPictureBox.cpp" />
     <ClCompile Include="MergeAbortDlg.cpp" />
@@ -392,6 +393,7 @@
     <ClInclude Include="ColumnManager.h" />
     <ClInclude Include="Commands\AutoTextTestCommand.h" />
     <ClInclude Include="Commands\DaemonCommand.h" />
+    <ClInclude Include="CommitIsOnRefsDlg.h" />
     <ClInclude Include="FindBar.h" />
     <ClInclude Include="GravatarPictureBox.h" />
     <ClInclude Include="MergeAbortDlg.h" />
