@@ -99,7 +99,7 @@ protected:
 
 	bool				CheckMultipleDiffs();
 
-	int					FillRevFromString(GitRev *rev, CString str)
+	int					FillRevFromString(GitRev* rev, const CString& str)
 	{
 		GitRev gitrev;
 		if (gitrev.GetCommit(str))

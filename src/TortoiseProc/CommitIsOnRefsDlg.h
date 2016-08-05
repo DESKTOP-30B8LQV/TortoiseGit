@@ -49,7 +49,7 @@ protected:
 	virtual void OnCancel();
 	virtual BOOL OnInitDialog();
 	afx_msg void OnEnChangeEditFilter();
-	afx_msg void OnBnClickedRev1Btn();
+	afx_msg void OnBnClickedSelRevBtn();
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 
 	DECLARE_MESSAGE_MAP()
@@ -58,7 +58,7 @@ protected:
 	STRING_VECTOR	m_RefList;
 
 	void AddToList();
-	int FillRevFromString(GitRev* rev, CString str)
+	int FillRevFromString(const CString& str)
 	{
 		GitRev gitrev;
 		if (gitrev.GetCommit(str))
@@ -66,14 +66,14 @@ protected:
 			MessageBox(gitrev.GetLastErr(), L"TortoiseGit", MB_ICONERROR);
 			return -1;
 		}
-		*rev = gitrev;
+		m_rev = gitrev;
 		return 0;
 	}
-	GitRev m_rev1;
+	GitRev m_rev;
 
 public:
-	CListCtrl			m_ctrlRefList;
-	CACEdit				m_ctrRev1Edit;
-	CMenuButton			m_cRev1Btn;
+	CListCtrl			m_cRefList;
+	CACEdit				m_cRevEdit;
+	CMenuButton			m_cSelRev;
 	CFilterEdit			m_cFilter;
 };

@@ -77,29 +77,18 @@
 #include "RevisiongraphCommand.h"
 #include "ShowCompareCommand.h"
 #include "DaemonCommand.h"
+#include "CommitIsOnRefsCommand.h"
 
 #if 0
-
-
-#include "CopyCommand.h"
 #include "CrashCommand.h"
-
-
-
-
-
 #include "PropertiesCommand.h"
 #include "RebuildIconCacheCommand.h"
 #include "RemoveCommand.h"
-
-
-
 #include "RevertCommand.h"
 #include "RTFMCommand.h"
-
 #include "UnIgnoreCommand.h"
-
 #endif
+
 typedef enum
 {
 	cmdAbout,
@@ -112,7 +101,6 @@ typedef enum
 	cmdClone,
 	cmdCommit,
 	cmdConflictEditor,
-	cmdCopy,
 	cmdCrash,
 	cmdDiff,
 	cmdDropCopy,
@@ -168,6 +156,7 @@ typedef enum
 	cmdRevisionGraph,
 	cmdDaemon,
 	cmdPGPFP,
+	cmdCommitIsOnRefs,
 } TGitCommand;
 
 static const struct CommandInfo
@@ -186,7 +175,6 @@ static const struct CommandInfo
 	{	cmdClone,			_T("clone")				},
 	{	cmdCommit,			_T("commit")			},
 	{	cmdConflictEditor,	_T("conflicteditor")	},
-	{	cmdCopy,			_T("copy")				},
 	{	cmdCrash,			_T("crash")				},
 	{	cmdDiff,			_T("diff")				},
 	{	cmdDropCopy,		_T("dropcopy")			},
@@ -242,6 +230,7 @@ static const struct CommandInfo
 	{	cmdRevisionGraph,	_T("revisiongraph")		},
 	{	cmdDaemon,			_T("daemon")			},
 	{	cmdPGPFP,			_T("pgpfp")				},
+	{	cmdCommitIsOnRefs,	_T("commitisonrefs")	},
 };
 
 
@@ -380,20 +369,12 @@ Command * CommandServer::GetCommand(const CString& sCmd)
 		return new ShowCompareCommand;
 	case cmdDaemon:
 		return new DaemonCommand;
+	case cmdCommitIsOnRefs:
+		return new CommitIsOnRefsCommand;
 
 #if 0
-
-
-
-	case cmdCopy:
-		return new CopyCommand;
 	case cmdCrash:
 		return new CrashCommand;
-
-
-
-	case cmdPrevDiff:
-		return new PrevDiffCommand;
 	case cmdProperties:
 		return new PropertiesCommand;
 	case cmdRTFM:

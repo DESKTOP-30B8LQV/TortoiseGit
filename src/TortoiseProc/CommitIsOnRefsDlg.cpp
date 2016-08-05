@@ -42,13 +42,13 @@ CCommitIsOnRefsDlg::~CCommitIsOnRefsDlg()
 void CCommitIsOnRefsDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
-	DDX_Control(pDX, IDC_LIST_REF_LEAFS, m_ctrlRefList);
+	DDX_Control(pDX, IDC_LIST_REF_LEAFS, m_cRefList);
 	DDX_Control(pDX, IDC_FILTER, m_cFilter);
-	DDX_Control(pDX, IDC_REV1EDIT, m_ctrRev1Edit);
+	DDX_Control(pDX, IDC_COMMIT, m_cRevEdit);
 }
 
 BEGIN_MESSAGE_MAP(CCommitIsOnRefsDlg, CResizableStandAloneDialog)
-	ON_BN_CLICKED(IDC_REV1BTN, OnBnClickedRev1Btn)
+	ON_BN_CLICKED(IDC_SELREF, OnBnClickedSelRevBtn)
 	ON_EN_CHANGE(IDC_FILTER, OnEnChangeEditFilter)
 	ON_WM_TIMER()
 END_MESSAGE_MAP()
@@ -67,22 +67,23 @@ BOOL CCommitIsOnRefsDlg::OnInitDialog()
 	CDialog::OnInitDialog();
 
 	AddAnchor(IDC_FILTER, BOTTOM_LEFT, BOTTOM_RIGHT);
-	//AddAnchor(IDC_STATIC, BOTTOM_LEFT);
-	AddAnchor(IDC_REV1BTN, TOP_RIGHT);
-	AddAnchor(IDC_REV1EDIT, TOP_LEFT);
+	AddAnchor(IDC_STATIC_FILTER, BOTTOM_LEFT);
+	AddAnchor(IDC_SELREF, TOP_RIGHT);
+	AddAnchor(IDC_COMMIT, TOP_LEFT);
 	AddAnchor(IDC_LIST_REF_LEAFS, TOP_LEFT, BOTTOM_RIGHT);
+	AddAnchor(IDC_LOG, TOP_RIGHT);
 	AddOthersToAnchor();
 
 	EnableSaveRestore(L"CommitIsOnRefsDlg");
 
 	CImageList* imagelist = new CImageList();
 	imagelist->Create(IDB_BITMAP_REFTYPE, 16, 3, RGB(255, 255, 255));
-	m_ctrlRefList.SetImageList(imagelist, LVSIL_SMALL);
+	m_cRefList.SetImageList(imagelist, LVSIL_SMALL);
 
 	CRect rect;
-	m_ctrlRefList.GetClientRect(&rect);
+	m_cRefList.GetClientRect(&rect);
 
-	this->m_ctrlRefList.InsertColumn(0, L"Ref", 0, rect.Width() - 50);
+	this->m_cRefList.InsertColumn(0, L"Ref", 0, rect.Width() - 50);
 	RefreshList();
 	return FALSE;
 }
@@ -90,7 +91,7 @@ BOOL CCommitIsOnRefsDlg::OnInitDialog()
 void CCommitIsOnRefsDlg::RefreshList()
 {
 	m_RefList.clear();
-	if (g_Git.GetRefsCommitIsOn(m_RefList, m_rev1.m_CommitHash, true, true, CGit::BRANCH_ALL))
+	if (g_Git.GetRefsCommitIsOn(m_RefList, m_rev.m_CommitHash, true, true, CGit::BRANCH_ALL))
 		MessageBox(g_Git.GetGitLastErr(_T("Could not get all refs.")), _T("TortoiseGit"), MB_ICONERROR);
 
 	AddToList();
@@ -98,7 +99,7 @@ void CCommitIsOnRefsDlg::RefreshList()
 
 void CCommitIsOnRefsDlg::AddToList()
 {
-	m_ctrlRefList.DeleteAllItems();
+	m_cRefList.DeleteAllItems();
 
 	CString filter;
 	m_cFilter.GetWindowText(filter);
@@ -116,7 +117,7 @@ void CCommitIsOnRefsDlg::AddToList()
 			nImage = 1;
 
 		if (ref.Find(filter) >= 0)
-			m_ctrlRefList.InsertItem(item++, ref, nImage);
+			m_cRefList.InsertItem(item++, ref, nImage);
 	}
 }
 
@@ -136,10 +137,9 @@ void CCommitIsOnRefsDlg::OnTimer(UINT_PTR nIDEvent)
 	__super::OnTimer(nIDEvent);
 }
 
-void CCommitIsOnRefsDlg::OnBnClickedRev1Btn()
+void CCommitIsOnRefsDlg::OnBnClickedSelRevBtn()
 {
-//	ClickRevButton(&this->m_cRev1Btn, &this->m_rev1, &this->m_ctrRev1Edit);
-	INT_PTR entry = m_cRev1Btn.GetCurrentEntry();
+	INT_PTR entry = m_cSelRev.GetCurrentEntry();
 	if (entry == 0) /* Browse Refence*/
 	{
 		{
@@ -147,10 +147,10 @@ void CCommitIsOnRefsDlg::OnBnClickedRev1Btn()
 			if (str.IsEmpty())
 				return;
 
-			if (FillRevFromString(&m_rev1, str))
+			if (FillRevFromString(str))
 				return;
 
-			m_ctrRev1Edit.SetWindowText(str);
+			m_cRevEdit.SetWindowText(str);
 		}
 	}
 
@@ -158,7 +158,7 @@ void CCommitIsOnRefsDlg::OnBnClickedRev1Btn()
 	{
 		CLogDlg dlg;
 		CString revision;
-		m_ctrRev1Edit.GetWindowText(revision);
+		m_cRevEdit.GetWindowText(revision);
 		dlg.SetParams(CTGitPath(), CTGitPath(), revision, revision, 0);
 		dlg.SetSelect(true);
 		if (dlg.DoModal() == IDOK)
@@ -166,10 +166,10 @@ void CCommitIsOnRefsDlg::OnBnClickedRev1Btn()
 			if (dlg.GetSelectedHash().empty())
 				return;
 
-			if (FillRevFromString(&m_rev1, dlg.GetSelectedHash().at(0).ToString()))
+			if (FillRevFromString(dlg.GetSelectedHash().at(0).ToString()))
 				return;
 
-			m_ctrRev1Edit.SetWindowText(dlg.GetSelectedHash().at(0).ToString());
+			m_cRevEdit.SetWindowText(dlg.GetSelectedHash().at(0).ToString());
 		}
 		else
 			return;
@@ -180,19 +180,19 @@ void CCommitIsOnRefsDlg::OnBnClickedRev1Btn()
 		CRefLogDlg dlg;
 		if (dlg.DoModal() == IDOK)
 		{
-			if (FillRevFromString(&m_rev1, dlg.m_SelectedHash))
+			if (FillRevFromString(dlg.m_SelectedHash))
 				return;
 
-			m_ctrRev1Edit.SetWindowText(dlg.m_SelectedHash);
+			m_cRevEdit.SetWindowText(dlg.m_SelectedHash);
 		}
 		else
 			return;
 	}
 
-	SetDlgItemText(IDC_FIRSTURL, m_rev1.m_CommitHash.ToString().Left(8) + _T(": ") + m_rev1.GetSubject());
-	if (!m_rev1.m_CommitHash.IsEmpty())
+	SetDlgItemText(IDC_FIRSTURL, m_rev.m_CommitHash.ToString().Left(8) + _T(": ") + m_rev.GetSubject());
+	if (!m_rev.m_CommitHash.IsEmpty())
 		m_tooltips.AddTool(IDC_FIRSTURL,
-		CLoglistUtils::FormatDateAndTime(m_rev1.GetAuthorDate(), DATE_SHORTDATE) + _T("  ") + m_rev1.GetAuthorName());
+		CLoglistUtils::FormatDateAndTime(m_rev.GetAuthorDate(), DATE_SHORTDATE) + _T("  ") + m_rev.GetAuthorName());
 
 	/*InterlockedExchange(&m_bThreadRunning, TRUE);
 	if (!AfxBeginThread(DiffThreadEntry, this))
